@@ -19,7 +19,7 @@ def is_mounted(special, directory):
     return False
 
 def umount(target):
-    os.system("umount " + target)
+    os.system("umount " + target + " -l")
 
 def mount(src, target, fstype, options):
     os.system("mount -t " + fstype + " -o " + options + " " + src + " " + target)
