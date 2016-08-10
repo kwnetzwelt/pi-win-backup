@@ -8,6 +8,7 @@ import ConfigParser
 Config = ConfigParser.ConfigParser()
 Config.read("backup.ini")
 
+runningIndicator = ".backuprunning"
 
 def is_mounted(special, directory):
     search_prefix = '{} on {}'.format(special, directory.rstrip('/'))
@@ -33,7 +34,7 @@ def make_sure_mounted(section):
 
 def parse_section(name):
     sec = {}
-
+    
     sec["src"] = Config.get(name, "MountSrc")
     sec["target"] = Config.get(name, "MountTarget")
     sec["options"] = Config.get(name, "Options")
@@ -44,8 +45,25 @@ def parse_section(name):
 def backup(From, To):
     os.system("rsync -a -v --delete " + From["target"] + " " + To["target"])
 
+def check_running():
+    return os.path.isfile(runningIndicator)
+
+def mark_running(mark):
+    if mark:
+        print("mark running: true")
+        f = open(runningIndicator,"w+")
+        f.close()
+    else:
+        print("mark running: false")
+        os.remove(runningIndicator)
 
 def main():
+
+    if check_running():
+        print("process already running. exiting. ")
+        return
+
+    mark_running(True)
 
     From = parse_section("From")
     To = parse_section("To")
@@ -54,5 +72,7 @@ def main():
     make_sure_mounted(To)
 
     backup(From, To)
+
+    mark_running(False)
 
 main()
