@@ -64,14 +64,17 @@ def main():
         return
 
     mark_running(True)
+    try:
+        From = parse_section("From")
+        To = parse_section("To")
 
-    From = parse_section("From")
-    To = parse_section("To")
+        make_sure_mounted(From)
+        make_sure_mounted(To)
 
-    make_sure_mounted(From)
-    make_sure_mounted(To)
-
-    backup(From, To)
+        backup(From, To)
+    except:
+        mark_running(False)
+        raise
 
     mark_running(False)
 
